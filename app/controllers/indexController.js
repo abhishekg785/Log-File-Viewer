@@ -22,7 +22,8 @@ var exports = module.exports;
 		var action = req.body.action;
 		//var readFile = readLargeFiles.ReadLargeFiles(filePath, action);
 		var obj = new file_module.ReadFile('/var/log/demo.txt', 2, action);
-		obj.readFile(obj.reader);
+		var data = obj.readFile(obj.reader);
+		res.end(data);
 	}
 
 })(exports);

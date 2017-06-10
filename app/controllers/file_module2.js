@@ -59,6 +59,7 @@ exports = module.exports;
       console.log(this.data);
       this.data = [];
       this.readStream.resume();
+      return this.data;
     }
   }
 
