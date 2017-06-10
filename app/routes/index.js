@@ -4,11 +4,8 @@ var router = express.Router();
 var indexController = require('../controllers/indexController');
 
 
-router.get('/', function(req, res, next) {
-  res.render('index');
-});
-
-router.post('/', indexController.processLogFile);
+router.get('/', indexController.GetIndex);
+router.post('/', indexController.ProcessLogFile);
 
 
 module.exports = router;

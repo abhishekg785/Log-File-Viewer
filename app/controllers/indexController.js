@@ -3,16 +3,22 @@
 * abhishekg785@gmail.com
 */
 
-var fs = require('fs');
+var readLargeFiles = require('./readLargeFile');
+var exports = module.exports;
 
-exports.processLogFile = function(req, res) {
-	var filePath = req.body.filePath;
-	fs.readFile(filePath, {encoding: 'utf-8'}, function(err, data) {
-		if(!err) {
-			console.log(data);
-		}
-		else {
-			console.log(err);
-		}
-	});
-}
+(function(exports) {
+
+	'use strict'
+
+	exports.GetIndex = function(req, res) {
+		res.render('index');
+	}
+
+	exports.ProcessLogFile = function(req, res) {
+		console.log(req.body);
+		var filePath = req.body.filePath;
+		console.log(filePath);
+		var readFile = new readLargeFiles.ReadLargeFiles(filePath);
+	}
+
+})(exports);

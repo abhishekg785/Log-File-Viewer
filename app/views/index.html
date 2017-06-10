@@ -1,13 +1,21 @@
 <html>
 <head>
+	<title></title>
 </head>
 <body>
 	<header>
-		
+
 	</header>
 	<section>
 		<input type = "text" name = "pathString" id = "path-string" placeholder = "/path/to/file" />
 		<button id = "view-button" >View</button>
+	</section>
+	<section id = "data-container"></section>
+	<section id = "navigation">
+		<button id = "start-data-nav" class = "nav-button" data-type = "start-nav">Start</button>
+		<button id = "previous-data-nav" class = "nav-button" data-type = "previous-nav">Previous</button>
+		<button id = "next-data-nav" class = "nav-button" data-type = "next-nav">Next</button>
+		<button id = "end-data-nav" class = "nav-button" data-type = "end-nav">End</button>
 	</section>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src = "js/main.js" type="text/javascript"></script>
