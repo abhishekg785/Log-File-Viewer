@@ -1,9 +1,11 @@
 /*
-* author : abhishek goswami
-* abhishekg785@gmail.com
-*/
+ * author : abhishek goswami
+ * abhishekg785@gmail.com
+ */
 
 var readLargeFiles = require('./readLargeFile');
+var file_module = require('./file_module2');
+
 var exports = module.exports;
 
 (function(exports) {
@@ -11,14 +13,16 @@ var exports = module.exports;
 	'use strict'
 
 	exports.GetIndex = function(req, res) {
+		console.log(readLargeFiles.setGlobalsVarToZero());
 		res.render('index');
 	}
 
 	exports.ProcessLogFile = function(req, res) {
-		console.log(req.body);
 		var filePath = req.body.filePath;
-		console.log(filePath);
-		var readFile = new readLargeFiles.ReadLargeFiles(filePath);
+		var action = req.body.action;
+		//var readFile = readLargeFiles.ReadLargeFiles(filePath, action);
+		var obj = new file_module.ReadFile('/var/log/demo.txt', 2, action);
+		obj.readFile(obj.reader);
 	}
 
 })(exports);

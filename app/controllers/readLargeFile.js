@@ -1,59 +1,80 @@
 /*
-* author : abhishek goswami
-* abhishekg785@gmail.com
-*/
+ * author : abhishek goswami
+ * abhishekg785@gmail.com
+ */
 
 var fs = require('fs'),
-		stream = require('stream'),
-		eventStream = require('event-stream');
+          stream = require('stream'),
+          es = require('event-stream');
 
 var exports = module.exports;
 
 (function(exports) {
-	'use strict'
+          'use strict'
 
-	var _Globals = {
-		LineCount : 10, // no of lines to count in a file
-		CurrentBufferPosition : 0, // position in the file currently pointing to
-		LastReadBufferPosition : 0, // last read position in the file
-	}
+          var _Globals = {
+                    LineCount: 2, // no of lines to count in a file
+                    CurrentBufferPosition: 0, // position in the file currently pointing to
+                    LastReadBufferPosition: 0, // last read position in the file
+                    SecondLastBufferPosition: 0
+          }
 
-	function ReadLargeFiles(filePath) {
-		this.filePath = filePath;
-		this.chunkSize = 0;
-		this.lineNumber = 0;
-		this.readStream = fs.createReadStream(filePath, {
-			start : _Globals.CurrentBufferPosition
-		});
-		this.readFile();
-	}
+          var NavActions = {
+                    start : 'start-nav',
+                    end : 'end-nav',
+                    next : 'next-nav',
+                    prev : 'previous-nav'
+          }
 
-	ReadLargeFiles.prototype.readFile = function() {
-		var that = this;
-		this.readStream.pipe(eventStream.split())
-			.pipe(eventStream.mapSync((line) => {
+          var readStream;
+          exports.ReadLargeFiles = function(filePath, action) {
+                    var currentLineNumber = 0;
+                    var chunkSize = 0;
+                    var startPosition = 0;
+                    // if(action == NavActions.start || action == NavActions.initial) {
+                    //           startPosition = 0;
+                    // }
+                    // else if(action == NavActions.next) {
+                    //           startPosition = _Globals.CurrentBufferPosition;
+                    // }
+                    // else if(action == NavActions.prev) {
+                    //           startPosition = _Globals.SecondLastBufferPosition
+                    // }
 
-					this.chunkSize += line.length;
-					this.lineNumber += 1;
+                    readStream = fs.createReadStream(filePath, {
+                                        start: _Globals.CurrentBufferPosition
+                              })
+                              .pipe(es.split())
+                              .pipe(es.mapSync(function(line) {
+                                        chunkSize += line.length + 1;
+                                        currentLineNumber += 1;
+                                        console.log(line);
+                                        console.log(currentLineNumber);
+                                        if (currentLineNumber == _Globals.LineCount) {
+                                                  _Globals.SecondLastBufferPosition = _Globals.LastReadBufferPosition;
+                                                  _Globals.LastReadBufferPosition = _Globals.CurrentBufferPosition;
+                                                  _Globals.CurrentBufferPosition = chunkSize + _Globals.LastReadBufferPosition;
+                                                  console.log(_Globals);
+                                                  readStream.destroy();
+                                        }
+                              }))
+                              .on('error', function(err) {
+                                        console.log('Error while reading file.', err);
+                              })
+                              .on('end', function() {
+                                        readStream = fs.createReadStream(filePath, {
+                                                            start: 0
+                                        })
+                                        _Globals.CurrentBufferPosition = 0;
+                                        _Globals.LastReadBufferPosition = 0;
+                                        _Globals.SecondLastBufferPosition = 0;
+                                        console.log('end of the file');
+                              })
+          }
 
-					if(this.lineNumber == 10) {
-						_Globals.LastReadBufferPosition = _Globals.CurrentBufferPosition;
-						_Globals.CurrentBufferPosition += this.chunkSize + _Globals.LastReadBufferPosition;
-						console.log(_Globals);
-						this.readStream.destroy();
-					}
-
-			}))
-			.on('error', function(err) {
-				console.log(err);
-			})
-			.on('end', function() {
-				console.log('File has been read till end successfully');
-			})
-	}
-
-	// new ReadLargeFiles('/var/log/mongodb/mongod.log');
-
-	exports.ReadLargeFiles = ReadLargeFiles;
+          exports.setGlobalsVarToZero = function() {
+                    _Globals.CurrentBufferPosition = 0;
+                    _Globals.LastReadBufferPosition = 0;
+          }
 
 })(exports);
