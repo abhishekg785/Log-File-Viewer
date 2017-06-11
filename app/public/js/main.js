@@ -26,7 +26,12 @@
 						'action' : action
 					},
 					success : function(data) {
-						Functions.HideMessage().HideLoader().EnableNavButtons();
+						Functions.HideMessage()
+							.HideLoader()
+							.EnableNavButtons();
+						var data = JSON.parse(data);
+						$Globals.dataArr = data; // cache the data for future queries
+						Functions.DisplayFetchedLogs($Globals.dataArr);
 						console.log(data);
 					},
 					error : function(err) {
@@ -65,21 +70,36 @@
 			},
 
 			LogErrorMessage : function() {
-				$('#data-view .message').html("<p><span>Error Occurred :(</span> Try Again after some time !</p>");
+				$Objects.DataViewMessage.html("<p><span>Error Occurred :(</span> Try Again after some time !</p>");
+			},
+
+			DisplayFetchedLogs : function(dataArr) {
+				$Objects.DataView.empty();
+				var html = "<ul>";
+				dataArr.forEach(function(data) {
+					html += "<li>" + data + "</li>";
+				});
+				html += "</ul>";
+				$Objects.DataView.append(html);
 			}
 		}
 
 
 	$d.ready(function() {
-
 		$Objects.PathString = $('#path-string');
 		$Objects.ViewButton = $('#view-button');
 		$Objects.Message = $('.message');
+		$Objects.DataViewMessage = $('#data-view .message');
 		$Objects.LoaderContainer = $('#loader-container');
 		$Objects.NavigationButton = $('.nav-button');
+		$Objects.DataView = $('#data-view');
 
 		$Objects.ViewButton.bind('click', function(e) {
 			var filePath = $Objects.PathString.val();
+			if(filePath == "") {
+				$Objects.DataViewMessage.html("<p><span>File Path</span> is Required !</p>");
+				return false;
+			}
 			var action = 'initial';
 			Functions.FetchFileData(filePath, action).ShowLoader();
 		});

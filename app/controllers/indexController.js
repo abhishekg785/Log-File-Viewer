@@ -20,10 +20,17 @@ var exports = module.exports;
 	exports.ProcessLogFile = function(req, res) {
 		var filePath = req.body.filePath;
 		var action = req.body.action;
-		//var readFile = readLargeFiles.ReadLargeFiles(filePath, action);
-		var obj = new file_module.ReadFile('/var/log/demo.txt', 2, action);
-		var data = obj.readFile(obj.reader);
-		res.end(data);
+
+		try {
+			var obj = new file_module.ReadFile(filePath, 10, action);
+			obj.readFile(function(data) {
+				console.log(data);
+				res.end(JSON.stringify(data));
+			}, obj.reader);
+		}
+		catch(ex) {
+			console.log(ex);
+		}
 	}
 
 })(exports);

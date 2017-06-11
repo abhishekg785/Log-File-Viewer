@@ -170,6 +170,16 @@ header h1 {
   margin-top: 0.5rem;
   overflow-x: auto;
   overflow-y: auto;
+  font-size: 1.6rem;
+  text-align: left;
+}
+
+#data-view ul {
+  list-style: none;
+}
+
+#data-view ul>li{
+  padding: 0.1rem;
 }
 
 .message {
