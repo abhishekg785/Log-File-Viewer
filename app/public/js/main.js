@@ -84,7 +84,6 @@
 			}
 		}
 
-
 	$d.ready(function() {
 		$Objects.PathString = $('#path-string');
 		$Objects.ViewButton = $('#view-button');
