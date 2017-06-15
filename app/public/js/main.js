@@ -10,16 +10,17 @@
 	var $Globals = {};
 
 	var	Functions = {
-			/*
-			* sends an ajax  request to the server with the file path.
+			/**
+			* sends ajax  request to the server with the file path.
 			* this function will fetch the data of the file in the
 			* path passed as a parameter.
 			*
-			* @param { string } filepath = Path to the file to fetch data from
+			* @param { string } url - url of the server
+			* @param { string } filePath - Path to the file
 			*/
-			FetchFileData : function(filePath, action) {
+			FetchFileData : function(url, filePath, action) {
 				$.ajax({
-					url : 'http://localhost:3000',
+					url : url,
 					type : 'POST',
 					data : {
 						'filePath' : filePath,
@@ -32,7 +33,6 @@
 						var data = JSON.parse(data);
 						$Globals.dataArr = data; // cache the data for future queries
 						Functions.DisplayFetchedLogs($Globals.dataArr);
-						console.log(data);
 					},
 					error : function(err) {
 						console.log(err);
@@ -50,10 +50,12 @@
 
 			ShowMessage : function() {
 				$Objects.Message.css('display', 'block');
+				return Functions;
 			},
 
 			ShowLoader : function() {
 				$Objects.LoaderContainer.css('display', 'block');
+				return Functions;
 			},
 
 			HideLoader : function() {
@@ -63,14 +65,17 @@
 
 			EnableNavButtons : function() {
 				$Objects.NavigationButton.prop("disabled", false);
+				return Functions;
 			},
 
 			DisableNavButtons : function() {
 				$Objects.NavigationButton.prop("disabled", true);
+				return Functions;
 			},
 
 			LogErrorMessage : function() {
 				$Objects.DataViewMessage.html("<p><span>Error Occurred :(</span> Try Again after some time !</p>");
+				return Functions;
 			},
 
 			DisplayFetchedLogs : function(dataArr) {
@@ -81,6 +86,7 @@
 				});
 				html += "</ul>";
 				$Objects.DataView.append(html);
+				return Functions;
 			}
 		}
 
@@ -93,6 +99,8 @@
 		$Objects.NavigationButton = $('.nav-button');
 		$Objects.DataView = $('#data-view');
 
+		var requestURL = 'http://localhost:3000';
+
 		$Objects.ViewButton.bind('click', function(e) {
 			var filePath = $Objects.PathString.val();
 			if(filePath == "") {
@@ -100,13 +108,13 @@
 				return false;
 			}
 			var action = 'initial';
-			Functions.FetchFileData(filePath, action).ShowLoader();
+			Functions.FetchFileData(requestURL, filePath, action).ShowLoader();
 		});
 
 		$Objects.NavigationButton.bind('click', function(e) {
 			var filePath = $Objects.PathString.val();
 			var action = e.target.dataset.type;
-			Functions.FetchFileData(filePath, action).ShowLoader();
+			Functions.FetchFileData(requestURL, filePath, action).ShowLoader();
 		});
 
 		Functions.DisableNavButtons();

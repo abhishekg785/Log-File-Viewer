@@ -1,0 +1,31 @@
+Log File Viewer
+---------------
+
+A simple web app in Node.JS, that fetches the logs from the log file at the server and displays the fetched data to the clint 10 records at a time.
+
+Considering the file size is too large , reading the file as a whole is not a good approach, as it will consume
+                -----------------------
+a lot of memory or RAM.
+
+So the Node.JS Streams comes to the rescue.
+      -----------------
+Reading chunks of data at a given time rather than the whole file will take less memory.
+
+This can be further optimized if i read only the desired data from the file, rather than
+reading the unnecessary part of the file to the initial required position ( start position ).
+
+This can be done using offsets in file, i.e keeping records of the start/end offset in the file,
+and then start reading from the required start offset to the end offset and keep repeating the steps.
+
+Porblems Occurred :
+-------------------
+
+It works fine when it comes to :
+      - reading the next 10 records each time from the file
+      - reading the last 10 records
+      - reading start 10 records
+
+but problem occurs when it comes to reading previous 10 records as the chunk size is variable each time and
+going back to the previous 10 records becomes quite messy.
+
+However working on it ! Maybe i get some solution for that.

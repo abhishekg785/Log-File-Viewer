@@ -1,6 +1,9 @@
 /*
  * author : abhishek goswami
  * abhishekg785@gmail.com
+ *
+ * Simple function to read large files using stream
+ * NOte : Not in use ( just for practice )
  */
 
 var fs = require('fs'),
@@ -10,6 +13,7 @@ var fs = require('fs'),
 var exports = module.exports;
 
 (function(exports) {
+
           'use strict'
 
           var _Globals = {

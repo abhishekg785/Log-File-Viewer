@@ -3,11 +3,11 @@
  * abhishekg785@gmail.com
  */
 
-var file_module = require('./file_module2');
+var file_module = require('./fileProcess.js'); // module for handling the files
 
-var exports = module.exports;
+exports = module.exports;
 
-(function(exports) {
+;(function(exports) {
 
 	'use strict'
 
@@ -23,7 +23,7 @@ var exports = module.exports;
 		try {
 			var obj = new file_module.ReadFile(filePath, 10, action);
 			obj.readFile(function(data) {
-				res.end(JSON.stringify(data));
+				res.end(JSON.stringify(data)); // send the data to the client
 			}, obj.reader);
 		}
 		catch(ex) {
