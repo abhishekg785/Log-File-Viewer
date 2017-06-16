@@ -29,3 +29,11 @@ but problem occurs when it comes to reading previous 10 records as the chunk siz
 going back to the previous 10 records becomes quite messy.
 
 However working on it ! Maybe i get some solution for that.
+
+Steps to Run :
+1. cd into the project dir
+2. do 'sudo npm install' to install npm modules
+3. node bin/www
+
+This will start the server at port 3000
+Go to localhost:3000 on the browser.
