@@ -1,4 +1,7 @@
-/*
+/**
+* NOTE : tHIS MODULE HANDLES THE NEXT, AND STARTING 10 RECORDS FUNCTIONALITY AT THE MOMENT
+* Previous and the last records fetch function will be added soon :)
+*
 * author : abhishek goswami
 * abhishekg785@gmail.com
 *
@@ -77,36 +80,35 @@ exports = module.exports;
   * Fetching the data is done using start/end offsets in the file and thus
   * saving time to not go through the entire file each time.
   *
-  * @param { function } sendData - sends the fetched data
   * @param { function } callback - calls the reader fuction of the class
   */
-  ReadFile.prototype.readFile = function (sendData, callback) {
-    var _this = this; // saves this context in _this
-    this.readStream.pipe(es.split())  // readStream
+  ReadFile.prototype.readFile = function(callback) {
+    var that = this; // saves this context
+    console.log(that);
+    that.readStream.pipe(es.split())
     .pipe(es.mapSync(function(line) {
-      _this.readStream.pause(); // pause the stream for the while
-      _this.chunkSize += line.length + 1; // calculates the chunk size of the portion of the file being read ( 10 lines )
-      _this.currentLineNumber += 1; // calculates the current line count in the file
-      _this.data.push(line); //
-      if(_this.currentLineNumber == _this.lineCount) {
-        sendData(_this.data);
-        callback.call(_this, _this.data); // binding this to the function
-        if(_this.action == NavActions.start || _this.action == NavActions.initial) { // will get executed for the start action.
+      console.log(line);
+      that.readStream.pause();
+      that.chunkSize += line.length + 1;
+      that.currentLineNumber += 1; // calculates the current line count in the file
+      that.data.push(line); // maintain an array of data
+      if(that.currentLineNumber == that.lineCount) { // we have 10 lines of data now and end reading stream
+        callback(null, that.data);
+        if(that.action == NavActions.start || that.action == NavActions.initial) { // will get executed for the start action
           SetGlobalsVarToZero();
-          _Globals.CurrentBufferPosition  += _this.chunkSize;
+          _Globals.CurrentBufferPosition  += that.chunkSize;
         }
-        else if(_this.action == NavActions.prev) {
-          _Globals.CurrentBufferPosition = _this.chunkSize + _Globals.SecondLastBufferPosition;
-          // _Globals.CurrentBufferPosition = _Globals.LastReadBufferPosition;
+        else if(that.action == NavActions.prev) {  // will get executed for the previous action.
+          _Globals.CurrentBufferPosition = that.chunkSize + _Globals.SecondLastBufferPosition;
           _Globals.LastReadBufferPosition = _Globals.SecondLastBufferPosition;
         }
-        else if(_this.action == NavActions.next) {
+        else if(that.action == NavActions.next) {  // will get executed for the next action.
           _Globals.SecondLastBufferPosition = _Globals.LastReadBufferPosition;
           _Globals.LastReadBufferPosition = _Globals.CurrentBufferPosition;
-          _Globals.CurrentBufferPosition += _this.chunkSize;
+          _Globals.CurrentBufferPosition += that.chunkSize;
         }
         console.log(_Globals);
-        _this.readStream.destroy(); // destroy the read stream here  as our work has been done !
+        that.readStream.destroy(); // destroy the read stream here  as our work has been done !
       }
     }))
   }
@@ -114,9 +116,11 @@ exports = module.exports;
   /**
   * @param { Array } data - Array of the fetched data
   */
-  ReadFile.prototype.reader = function(data) {
+  ReadFile.prototype.readLimiter = function(callback) {
+    console.log('Limiting file');
     this.data = [];
     this.readStream.resume(); // resume the stream after taking these action
+    callback(null);
   }
 
   /*

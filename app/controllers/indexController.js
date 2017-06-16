@@ -1,8 +1,9 @@
 /*
- * author : abhishek goswami
- * abhishekg785@gmail.com
- */
+* author : abhishek goswami
+* abhishekg785@gmail.com
+*/
 
+var async = require('async');
 var file_module = require('./fileProcess.js'); // module for handling the files
 
 exports = module.exports;
@@ -20,15 +21,23 @@ exports = module.exports;
 		var filePath = req.body.filePath;
 		var action = req.body.action;
 
-		try {
-			var obj = new file_module.ReadFile(filePath, 10, action);
-			obj.readFile(function(data) {
-				res.end(JSON.stringify(data)); // send the data to the client
-			}, obj.reader);
-		}
-		catch(ex) {
-			console.log(ex);
-		}
+		var obj = new file_module.ReadFile(filePath, 10, action);
+		async.waterfall([
+			obj.readFile.bind(obj),
+			function(data, callback) {
+				res.end(JSON.stringify(data));
+				callback(null);
+			},
+			obj.readLimiter.bind(obj)
+		],
+		function(err, data) {
+			if(!err) {
+				console.log(err);
+			}
+			else {
+				console.log(data);
+			}
+		});
 	}
 
 })(exports);
