@@ -12,6 +12,9 @@ exports = module.exports;
 
 	'use strict'
 
+	// cache the error string to show to client
+	var errStr = "<p class = 'message'>File <span>not Found!</span></p>";
+
 	exports.GetIndex = function(req, res) {
 		file_module.SetGlobalsVarToZero();
 		res.render('index');
@@ -21,10 +24,15 @@ exports = module.exports;
 		var filePath = req.body.filePath;
 		var action = req.body.action;
 
-		var obj = new file_module.ReadFile(filePath, 10, action);
+		var obj = new file_module.ReadFile(filePath, 10, action, function errorHandler(err) {
+			var string = String(err);
+			res.end(JSON.stringify([errStr]));
+		});
+
 		async.waterfall([
 			obj.readFile.bind(obj),
 			function(data, callback) {
+				console.log('sending data');
 				res.end(JSON.stringify(data));
 				callback(null);
 			},

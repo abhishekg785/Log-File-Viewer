@@ -42,7 +42,8 @@ exports = module.exports;
   *
   * @constructor
   */
-  function ReadFile(filePath, lineCount, action) {
+  function ReadFile(filePath, lineCount, action, errorHandler) {
+    console.log('here');
     this.filePath = filePath; // path to the file
     this.chunkSize = 0; // chunk of the file being read at a time
     this.startPosition = 0; // start position of the file default
@@ -50,9 +51,13 @@ exports = module.exports;
     this.lineCount = lineCount; // the count of the lines to be read at a time
     this.data = []; // fetched data or 10 lines will be stored here
     this.action = action; // action such as next, prev, begin or end of the file
-    this.decideCurrentBufferPos(this.action); //
+    this.decideCurrentBufferPos(this.action); // decide the startPos where to start file reading from
     this.readStream = fs.createReadStream(filePath, {
       start: _Globals.ReadFileFrom
+    })
+    .on('error', function(err) {
+      var error = new Error('File not Found!');
+      errorHandler(error);
     });
   }
 
@@ -83,11 +88,12 @@ exports = module.exports;
   * @param { function } callback - calls the reader fuction of the class
   */
   ReadFile.prototype.readFile = function(callback) {
+    console.log('reading file');
     var that = this; // saves this context
-    console.log(that);
+    // console.log(that);
     that.readStream.pipe(es.split())
     .pipe(es.mapSync(function(line) {
-      console.log(line);
+      // console.log(line);
       that.readStream.pause();
       that.chunkSize += line.length + 1;
       that.currentLineNumber += 1; // calculates the current line count in the file
@@ -107,7 +113,7 @@ exports = module.exports;
           _Globals.LastReadBufferPosition = _Globals.CurrentBufferPosition;
           _Globals.CurrentBufferPosition += that.chunkSize;
         }
-        console.log(_Globals);
+        // console.log(_Globals);
         that.readStream.destroy(); // destroy the read stream here  as our work has been done !
       }
     }))
