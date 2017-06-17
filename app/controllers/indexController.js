@@ -40,10 +40,10 @@ exports = module.exports;
 		],
 		function(err, data) {
 			if(!err) {
-				console.log(err);
+				console.log(data);
 			}
 			else {
-				console.log(data);
+				console.log(err);
 			}
 		});
 	}
