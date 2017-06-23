@@ -1,0 +1,198 @@
+<!--
+    author : abhishek goswami
+    abhishekg785@gmail.com
+
+    unit test for the main.js file
+-->
+<html>
+<head>
+    <title>Test Runner</title>
+    <link rel = 'stylesheet' href = '../node_modules/mocha/mocha.css' />
+</head>
+<body>
+<div id = 'mocha'></div>
+<script src = '../node_modules/mocha/mocha.js'></script>
+<script src = '../node_modules/sinon/pkg/sinon-2.3.4.js'></script>
+<script src = '../node_modules/chai/chai.js'></script>
+<script>mocha.setup('bdd')</script>
+<!-- file to test i.e main.js -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src = '../app/public/js/main.js'></script>
+<script>
+    var assert = chai.assert;
+    var expect = chai.expect;
+
+    // testing the ajax POST request
+    describe("Ajax post request", function() {
+        var dataViewData = [];
+        // dummy data to send to client on request success
+        var data = [
+            {
+                lineNumber : 1,
+                log : 'This is log1'
+            },
+            {
+                lineNumber : 2,
+                log : 'This is log2'
+            }
+        ];
+        data = JSON.stringify(data);
+        beforeEach(function() {
+            $Objects.DataView = new Object();
+            $Objects.DataView.empty = function() {
+                dataViewData = [];
+            }
+            $Objects.DataView.append = function(value){
+                dataViewData.push(value);
+            }
+            sinon.stub($, 'ajax').yieldsTo('success', data);
+        });
+
+        afterEach(function() {
+            dataViewData = [];
+            $.ajax.restore();
+        })
+
+        it('should make an ajax call', function(done) {
+            Functions.FetchFileData('/var/log/mongodb/mongod.log', 'next-nav');
+            expect($.ajax.calledOnce).to.be.true;
+            done();
+        });
+
+        it('should fetch the received data on success and set it to the $Globals.dataArr', function(done) {
+            Functions.FetchFileData('/var/log/mongodb/mongod.log', 'next-nav');
+            expect(JSON.stringify($Globals.dataArr.length)).to.be.equal('2');
+            done();
+        });
+    })
+
+    // testing the functions for the loader
+    describe("Testing the functions for the loader", function() {
+        var loaderStatus = {};
+        $Objects.LoaderContainer = new Object();
+        $Objects.LoaderContainer.css = function (prop, val) {
+            if(prop && val) {
+                loaderStatus.prop = val;
+            }
+            else if(prop) {
+                return loaderStatus.prop;
+            }
+        }
+        describe('testing for the ShowLoader()', function() {
+            it('must hide the loader if the loader is visible', function() {
+                Functions.HideLoader();
+                assert.equal($Objects.LoaderContainer.css('display'), 'none');
+            })
+        })
+        describe('testing for the HideLoader function', function() {
+            it('must hide the loader if the loader is hidden', function() {
+                Functions.ShowLoader();
+                assert.equal($Objects.LoaderContainer.css('display'), 'block');
+            })
+        })
+    });
+
+    // testing the message value to be shown to the user
+    describe("Testing the functions for the Message Paragraph", function() {
+        var messageStatus = {};
+        $Objects.Message = new Object();
+        $Objects.Message.css = function (prop, val) {
+            if(prop && val) {
+                messageStatus.prop = val;
+            }
+            else if(prop) {
+                return messageStatus.prop;
+            }
+        }
+        describe('testing for the HideMessage()', function() {
+            it('must set the message paragraph display to none', function() {
+                Functions.HideMessage();
+                assert.equal($Objects.Message.css('display'), 'none');
+            })
+        })
+        describe('testing for the ShowMessage()', function() {
+            it('must set the message paragraph display to block', function() {
+                Functions.ShowMessage();
+                assert.equal($Objects.Message.css('display'), 'block');
+            })
+        })
+    });
+
+    // testing the visibility of the navigation buttons in the DOM
+    describe("Testing for the Nav Buttons functions", function() {
+        var navButtonStatus = {};
+        $Objects.NavigationButton = new Object();
+        $Objects.NavigationButton.prop = function (prop, val) {
+            var valStr;
+            if(typeof(val) == "boolean") {
+                valStr = val == true ? "true" : "false";
+            }
+            else {
+                valStr = val;
+            }
+            if(prop && valStr) {
+                navButtonStatus.prop = val;
+            }
+            else if(prop) {
+                return navButtonStatus.prop;
+            }
+        }
+        describe('testing for the EnableNavButtons()', function() {
+            it('must set the disabled property of the nav buttons to false', function() {
+                Functions.EnableNavButtons();
+                assert.equal($Objects.NavigationButton.prop('disabled'), false);
+            })
+        })
+        describe('testing for the DisableNavButtons()', function() {
+            it('must set the disabled property of the nav buttons to block', function() {
+                Functions.DisableNavButtons();
+                assert.equal($Objects.NavigationButton.prop('disabled'), true);
+            })
+        })
+    });
+
+    // testing the error message to be printed
+    describe("testing the  LogErrorMessage()", function() {
+        it('function should set the html value to the passed message as a parameter', function(done) {
+            var errorMessage = "This is a sample error message";
+            var htmlMessageStatus = {};
+            $Objects.DataViewMessage = new Object();
+            $Objects.DataViewMessage.html = function(message){
+                htmlMessageStatus.html = message;
+            }
+            Functions.LogErrorMessage(errorMessage);
+            assert.equal(htmlMessageStatus.html, errorMessage);
+            done();
+        })
+    })
+
+    // test for the function which populates the fetched data into the DOM
+    describe('Testing for the displayFetchedLogs()', function() {
+        var dummyHTMLDOM,
+            dummyData = ['This is data1', 'This is data2'];
+        before(function() {
+            dummyHTMLDOM = [];
+            $Objects.DataView = new Object();
+            $Objects.DataView.append = function(html) {
+                dummyHTMLDOM = dummyData;
+            }
+            $Objects.DataView.empty = function() {
+                dummyHTMLDOM = [];
+            }
+        })
+        it('should set the passed data and populate the data into DOM', function(done) {
+            console.log($Objects.DataView);
+            Functions.DisplayFetchedLogs(dummyData);
+            assert.equal(dummyHTMLDOM, dummyData);
+            done();
+        })
+        after(function() {
+            $Objects.DataView = new Object();
+        });
+    })
+
+
+</script>
+<script>mocha.run();</script>
+</body>
+</html>
