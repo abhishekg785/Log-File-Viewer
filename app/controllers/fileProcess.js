@@ -85,7 +85,6 @@ exports = module.exports;
      * @param { function } callback - calls the reader fuction of the class
      */
     ReadFile.prototype.readFile = function(callback) {
-        console.log('reading file');
         var that = this; // saves this context
         // console.log(that);
         that.readStream.pipe(es.split())
@@ -96,7 +95,6 @@ exports = module.exports;
                 that.currentLineNumber += 1; // calculates the current line count in the file
                 that.data.push(line); // maintain an array of data
                 if(that.currentLineNumber == that.lineCount) { // we have 10 lines of data now and end reading stream
-                    callback(null, that.data);
                     if(that.action == NavActions.start || that.action == NavActions.initial) { // will get executed for the start action
                         SetGlobalsVarToZero();
                         _Globals.CurrentBufferPosition  += that.chunkSize;
@@ -106,11 +104,12 @@ exports = module.exports;
                         _Globals.LastReadBufferPosition = _Globals.SecondLastBufferPosition;
                     }
                     else if(that.action == NavActions.next) {  // will get executed for the next action.
+                        console.log('REading file');
                         _Globals.SecondLastBufferPosition = _Globals.LastReadBufferPosition;
                         _Globals.LastReadBufferPosition = _Globals.CurrentBufferPosition;
                         _Globals.CurrentBufferPosition += that.chunkSize;
                     }
-                    // console.log(_Globals);
+                    callback(null, that.data);
                     that.readStream.destroy(); // destroy the read stream here  as our work has been done !
                 }
             }))
