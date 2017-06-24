@@ -138,4 +138,7 @@ exports = module.exports;
     exports.SetGlobalsVarToZero = SetGlobalsVarToZero;
     exports.ReadFile = ReadFile;
 
+    // for testing purposes
+    exports._Globals = _Globals;
+
 })(exports);

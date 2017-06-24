@@ -11,17 +11,21 @@ var assert = require('chai').assert;
 var fileProcess = require('../app/controllers/fileProcess');
 
 describe("testing the fileProcess module", function() {
-    describe("ReadFile constructor must set the values as passed in the parameter", function() {
-        var obj,
-            filePath = path.join(__dirname, 'testFile'),
-            lineCount = 10,
-            action = 'initial',
-            errorStatus = false;
-        beforeEach(function() {
-            obj = new fileProcess.ReadFile(filePath, lineCount, action, function(err) {
-                errorStatus = true;
-            });
+
+    var obj,
+        filePath = path.join(__dirname, 'testFile'),
+        lineCount = 10,
+        action = 'initial',
+        errorStatus = false,
+        _Globals;
+    beforeEach(function() {
+        obj = new fileProcess.ReadFile(filePath, lineCount, action, function(err) {
+            errorStatus = true;
         });
+        _Globals = fileProcess._Globals;
+    });
+
+    describe("ReadFile constructor must set the values as passed in the parameter", function() {
         it('sets the value', function(done) {
             assert.equal(obj.filePath, filePath);
             assert.equal(obj.lineCount, lineCount);
@@ -35,5 +39,35 @@ describe("testing the fileProcess module", function() {
                 done();
             });
         })
+
+        it('must set the buffer positions to read the file, in this case the ReadFileFrom must be set to zero due to action = "initial"', function(done) {
+            assert.equal(_Globals.ReadFileFrom, 0);
+            done();
+        })
     });
+
+    describe('testing the decideCurrentBufferPos()', function() {
+        describe('must find the offset buffer positions to read the file', function() {
+            it('calculating for the action ="initial" or action = "start"', function(done) {
+                obj.decideCurrentBufferPos('initial');
+                done();
+            });
+
+            it('calculating for the action ="next-nav"', function(done) {
+                _Globals.CurrentBufferPosition = 4500; // any random value for testing
+                obj.decideCurrentBufferPos('next-nav');
+                assert.equal(_Globals.ReadFileFrom, _Globals.CurrentBufferPosition);
+                done();
+            });
+
+            it('calculating for the action ="previous-nav"', function(done) {
+                _Globals.CurrentBufferPosition = 4500; // any random value for testing
+                obj.decideCurrentBufferPos('next-nav');
+                assert.equal(_Globals.ReadFileFrom, _Globals.CurrentBufferPosition);
+                done();
+            });
+        });
+    });
+    
 });
+
