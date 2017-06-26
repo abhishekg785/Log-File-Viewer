@@ -37,3 +37,27 @@ Steps to Run :
 
 This will start the server at port 3000
 Go to localhost:3000 on the browser.
+
+Testing
+-------
+
+I have used the following tools for testing :
+Mocha  : for testing
+Chai   : for assertion
+Sinon  : for stubs and spies implementations
+
+The test cases are present on the test folder inside the project dir.
+i.e /test
+
+The test dir also contains a test file to be used in testing.
+
+This is how to run the test cases :
+
+for the main.js file ( /app/public/js/main.js)
+
+    - Simply open the file testRunner.html file in the browser and it will run the test cases for the main.js file.
+
+for the node js modules :
+
+    - Simply run the command => npm run test
+    This will run all the test files present in the test folder.
